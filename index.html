@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SE Study Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3e;
+    --accent: #6ee7b7;
+    --accent2: #818cf8;
+    --accent3: #f9a8d4;
+    --accent4: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --tag-bg: #1e293b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; min-height: 100vh; }
+  .ml { font-family: 'Noto Sans Malayalam', sans-serif; }
+
+  header {
+    padding: 2rem 1.5rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #12151f 0%, var(--bg) 100%);
+  }
+  header h1 { font-size: 1.6rem; font-weight: 800; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+  header p { color: var(--muted); font-size: 0.8rem; margin-top: 0.3rem; }
+
+  .progress-bar-wrap { height: 3px; background: var(--border); }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s ease; }
+
+  .search-wrap { padding: 1rem 1.2rem 0.5rem; position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--border); }
+  .search-wrap input { width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text); font-family: 'Sora', sans-serif; font-size: 0.85rem; padding: 0.6rem 1rem; border-radius: 8px; outline: none; }
+  .search-wrap input:focus { border-color: var(--accent2); }
+  .search-wrap input::placeholder { color: var(--muted); }
+
+  .topic-list { display: flex; flex-direction: column; }
+
+  .topic-item { border-bottom: 1px solid var(--border); overflow: hidden; }
+
+  .topic-header { display: flex; align-items: center; gap: 0.8rem; padding: 1rem 1.2rem; cursor: pointer; transition: background 0.2s; user-select: none; }
+  .topic-header:hover { background: rgba(255,255,255,0.03); }
+  .topic-header.done { opacity: 0.5; }
+
+  .topic-num { font-size: 0.65rem; font-weight: 700; color: var(--accent); background: rgba(110,231,183,0.08); border: 1px solid rgba(110,231,183,0.2); border-radius: 5px; padding: 0.15rem 0.4rem; min-width: 28px; text-align: center; flex-shrink: 0; }
+  .topic-title { font-size: 0.92rem; font-weight: 600; flex: 1; line-height: 1.3; }
+  .topic-ml { font-size: 0.7rem; color: var(--muted); font-family: 'Noto Sans Malayalam', sans-serif; }
+  .chevron { color: var(--muted); font-size: 0.75rem; transition: transform 0.3s; flex-shrink: 0; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .check-btn { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 0.7rem; }
+  .check-btn.done { background: var(--accent); border-color: var(--accent); color: #0f1117; font-weight: 800; }
+
+  .topic-body { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; background: rgba(255,255,255,0.015); }
+  .topic-body.open { max-height: 9999px; }
+
+  .topic-content { padding: 0 1.2rem 1.6rem; }
+
+  .marks-badge { display: inline-block; font-size: 0.65rem; font-weight: 700; background: rgba(129,140,248,0.12); color: var(--accent2); border: 1px solid rgba(129,140,248,0.25); border-radius: 20px; padding: 0.15rem 0.55rem; margin-bottom: 1rem; margin-top: 0.8rem; }
+
+  .section { margin-bottom: 1.2rem; }
+  .section-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.5rem; }
+
+  .def-en { font-size: 0.83rem; line-height: 1.75; color: #cbd5e1; margin-bottom: 0.5rem; }
+  .ml-block { font-family: 'Noto Sans Malayalam', sans-serif; background: rgba(110,231,183,0.06); border-left: 3px solid var(--accent); padding: 0.65rem 0.85rem; border-radius: 0 6px 6px 0; font-size: 0.82rem; line-height: 2; color: #a7f3d0; }
+
+  .divider { height: 1px; background: var(--border); margin: 1rem 0; }
+
+  /* Key point card */
+  .kp-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .kp-card { background: #181b26; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .kp-en { font-size: 0.82rem; color: #e2e8f0; padding: 0.6rem 0.85rem 0.45rem; line-height: 1.65; border-bottom: 1px dashed #2a2d3e; }
+  .kp-en strong { color: var(--accent4); }
+  .kp-ml { font-family: 'Noto Sans Malayalam', sans-serif; font-size: 0.8rem; color: #93c5fd; padding: 0.45rem 0.85rem 0.6rem; line-height: 1.9; background: rgba(129,140,248,0.04); }
+
+  /* Example block */
+  .example-wrap { background: rgba(249,168,212,0.05); border-left: 3px solid var(--accent3); border-radius: 0 8px 8px 0; overflow: hidden; }
+  .example-en { font-size: 0.82rem; color: #fbcfe8; padding: 0.65rem 0.85rem 0.4rem; line-height: 1.7; border-bottom: 1px dashed rgba(249,168,212,0.15); }
+  .example-ml { font-family: 'Noto Sans Malayalam', sans-serif; font-size: 0.8rem; color: #fda4af; padding: 0.4rem 0.85rem 0.65rem; line-height: 1.95; }
+
+  .footer-stats { padding: 1rem 1.2rem; text-align: center; color: var(--muted); font-size: 0.72rem; border-top: 1px solid var(--border); }
+  .footer-stats span { color: var(--accent); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📚 SE Study Notes</h1>
+  <p>5-Mark Notes · English + മലയാളം · 30 Topics</p>
+</header>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+
+<div class="search-wrap">
+  <input type="text" id="searchBox" placeholder="Search topics..." oninput="filterTopics(this.value)"/>
+</div>
+
+<div class="topic-list" id="topicList"></div>
+<div class="footer-stats">Completed: <span id="doneCount">0</span> / 30 topics</div>
+
+<script>
+const topics = [
+  {
+    num: 1,
+    title: "Cyberspace – Fundamental Definitions",
+    ml_title: "സൈബർസ്‌പേസ് – അടിസ്ഥാന നിർവചനങ്ങൾ",
+    def_en: "Cyberspace is the virtual, interconnected digital environment created by computer networks, the internet, communication systems, and digital devices. It is not a physical place but an abstract realm where information exists, flows, and is accessed by users worldwide.",
+    def_ml: "Cyberspace എന്നത് computers, networks, internet, digital devices എന്നിവ ചേർന്ന് ഉണ്ടാകുന്ന ഒരു virtual digital environment ആണ്. ഇത് ഒരു physical place അല്ല — information store ചെയ്യുകയും flow ആകുകയും ചെയ്യുന്ന ഒരു abstract realm ആണ്.",
+    keypoints: [
+      { en: "<strong>Physical Layer:</strong> Hardware like routers, cables, satellites, data centers, computers, and mobile devices — the foundation of cyberspace.", ml: "Routers, cables, satellites, data centers ഒക്കെ ഉൾപ്പെടുന്ന hardware layer — cyberspace-ന്റെ physical foundation." },
+      { en: "<strong>Logical Layer:</strong> Software, operating systems, protocols (TCP/IP, HTTP, DNS) that manage information flow.", ml: "Information flow manage ചെയ്യുന്ന software, OS, protocols (TCP/IP, HTTP, DNS) ഒക്കെ ഇതിൽ പെടുന്നു." },
+      { en: "<strong>Information Layer:</strong> The actual data — texts, images, videos, emails, websites stored or transmitted.", ml: "Actual data ആണ് ഇത് — texts, images, videos, emails, websites ഒക്കെ ഇതിൽ ഉൾപ്പെടുന്നു." },
+      { en: "<strong>User Layer:</strong> Individuals, organizations, governments, and even cyber attackers who interact within cyberspace.", ml: "Individuals, organizations, governments, cyber attackers — cyberspace-ൽ interact ചെയ്യുന്ന everyone." },
+      { en: "<strong>Key Characteristics:</strong> Borderless (global reach), Virtual (no face-to-face), Anonymous (identity can be hidden), Dynamic (constantly changing), Interconnected (billions of devices).", ml: "Cyberspace-ന്റെ സ്വഭാവങ്ങൾ: Borderless, Virtual, Anonymous, Dynamic, Interconnected — ഇവ remember ചെയ്യണം." }
+    ],
+    ex_en: "Think of cyberspace like the postal system, but instant and global. Your email (information layer) travels through internet cables (physical layer) using email protocols (logical layer), sent by you (user layer) — and it reaches someone in another country within seconds, crossing no physical border.",
+    ex_ml: "Cyberspace-നെ ഒരു postal system പോലെ ചിന്തിക്കൂ — പക്ഷേ instant ആയും global ആയും. നിങ്ങളുടെ email (information layer) internet cables (physical layer) വഴി protocols (logical layer) ഉപയോഗിച്ച്, നിങ്ങൾ (user layer) അയക്കുന്നു — seconds-ൽ മറ്റൊരു country-ൽ എത്തുന്നു, ഒരു border cross ചെയ്യാതെ."
+  },
+  {
+    num: 2,
+    title: "Jurisprudence and Jurisdiction in Cyberspace",
+    ml_title: "സൈബർസ്‌പേസിലെ ജൂറിസ്‌പ്രൂഡൻസും ജൂറിസ്ഡിക്ഷനും",
+    def_en: "Jurisprudence in cyberspace refers to the legal theory and principles that govern rights, responsibilities, and disputes in the digital world. Jurisdiction refers to the legal authority of a court or government to hear and decide cases involving online activities and cybercrimes.",
+    def_ml: "Cyber jurisprudence എന്നത് digital world-ൽ rights, responsibilities, disputes govern ചെയ്യുന്ന legal theory ആണ്. Jurisdiction എന്നത് online activities-മായി ബന്ധപ്പെട്ട cases decide ചെയ്യാനുള്ള ഒരു court-ന്റെ legal authority ആണ്.",
+    keypoints: [
+      { en: "<strong>Territorial Jurisdiction:</strong> Based on where the crime occurred or where the server is located. E.g., illegal data stored on an Indian server → Indian courts have jurisdiction.", ml: "Crime നടന്ന location അല്ലെങ്കിൽ server-ന്റെ location-ന്‌ based ആണ്. Example: Server India-യിൽ ആണെങ്കിൽ Indian court-ന് jurisdiction ഉണ്ട്." },
+      { en: "<strong>Personal Jurisdiction:</strong> Based on the identity or location of the offender or victim. Indian citizen commits crime online → Indian law may apply.", ml: "Offender അല്ലെങ്കിൽ victim-ന്റെ identity/location-ന്‌ based ആണ്. Indian citizen ആണ് criminal എങ്കിൽ Indian law apply ആകും." },
+      { en: "<strong>Subject-Matter Jurisdiction:</strong> Based on the type of crime — cyber fraud goes to cyber crime courts.", ml: "Crime-ന്റെ type-ന്‌ based ആണ്. Cyber fraud → cyber crime court." },
+      { en: "<strong>Extraterritorial Jurisdiction:</strong> A country applies its laws outside its borders. E.g., a US website violating Indian users' privacy can still be subject to Indian law.", ml: "ഒരു country-ക്ക് അതിന്റെ borders-ന് പുറത്തും law apply ചെയ്യാം. US website Indian users-ന്റെ privacy violate ചെയ്താൽ Indian law apply ആകാം." },
+      { en: "<strong>Key Challenges:</strong> Borderless internet (one crime can span many countries), different laws per country, anonymous identities, cloud data spread across nations, speed of cyber activities.", ml: "Main challenges: Borderless internet, ഓരോ country-ക്കും different laws, anonymous identities, cloud data multiple countries-ൽ, crimes instant ആയി നടക്കുന്നു." }
+    ],
+    ex_en: "A hacker sitting in Russia attacks a server located in the US that stores data of Indian users. Which country has jurisdiction? All three potentially do — this is exactly why cyber jurisdiction is complex and challenging.",
+    ex_ml: "Russia-ൽ ഇരിക്കുന്ന ഒരു hacker, US-ൽ ഉള്ള server attack ചെയ്യുന്നു, ആ server-ൽ Indian users-ന്റെ data ഉണ്ട്. ഏത് country-ക്കാണ് jurisdiction? മൂന്ന് country-ക്കും claim ചെയ്യാം — ഇതാണ് cyber jurisdiction-ന്റെ complexity."
+  },
+  {
+    num: 3,
+    title: "Need for IT Act & Enforcement Agencies",
+    ml_title: "IT ആക്ടിന്റെ ആവശ്യകതയും നിർവഹണ ഏജൻസികളും",
+    def_en: "Traditional laws were designed for the physical world and could not handle crimes in cyberspace. The Information Technology Act, 2000 was enacted by India's Parliament to provide a legal framework for electronic activities and to define punishments for cybercrimes.",
+    def_ml: "Traditional laws physical world-ന് വേണ്ടി ഉണ്ടാക്കിയതാണ്, cyber crimes handle ചെയ്യാൻ അതിന് കഴിഞ്ഞില്ല. അതുകൊണ്ടാണ് India Parliament Information Technology Act, 2000 pass ചെയ്തത് — electronic activities-ന് legal framework കൊടുക്കാൻ.",
+    keypoints: [
+      { en: "<strong>Why IT Act was Needed:</strong> Legal recognition for electronic records and digital signatures; protection against hacking, data theft, phishing; regulation of e-governance and online transactions; building trust in digital systems.", ml: "Electronic records-ന് legal status കൊടുക്കാൻ, hacking/data theft-ൽ നിന്ന് protect ചെയ്യാൻ, e-governance support ചെയ്യാൻ, digital trust build ചെയ്യാൻ IT Act വേണ്ടിവന്നു." },
+      { en: "<strong>Cyber Crime Investigation Cells (CCIC):</strong> Operate under state police; receive and investigate cybercrime complaints; collect digital evidence; coordinate with other agencies.", ml: "State police-ന്റെ കീഴിൽ operate ചെയ്യുന്നു. Cybercrime complaints receive ചെയ്ത് investigate ചെയ്യുന്നു, digital evidence collect ചെയ്യുന്നു." },
+      { en: "<strong>Controller of Certifying Authorities (CCA):</strong> Regulates Digital Signature Certificates; grants licenses to Certifying Authorities; ensures trust in electronic transactions.", ml: "Digital Signature Certificates regulate ചെയ്യുന്നു. Certifying Authorities-ന് license കൊടുക്കുന്നു. Electronic transactions-ന്റെ trust ഉറപ്പാക്കുന്നു." },
+      { en: "<strong>CERT-In (Indian Computer Emergency Response Team):</strong> National cybersecurity agency; handles cyber incidents; issues security alerts and advisories; coordinates response to threats.", ml: "National cybersecurity agency. Cyber incidents handle ചെയ്യുന്നു, security alerts issue ചെയ്യുന്നു, threats-ന്‌ response coordinate ചെയ്യുന്നു." },
+      { en: "<strong>Adjudicating Officers (AOs):</strong> Appointed by central government; handle financial cyber disputes up to ₹5 crore; have powers similar to a civil court.", ml: "Central government appoint ചെയ്യുന്നു. ₹5 crore വരെയുള്ള financial cyber disputes handle ചെയ്യുന്നു. Civil court-ന് similar powers ഉണ്ട്." },
+      { en: "<strong>Cyber Appellate Tribunal (CyAT):</strong> Hears appeals against decisions of Adjudicating Officers; ensures speedy disposal of cyber cases; further appeals go to the High Court.", ml: "Adjudicating Officers-ന്റെ decisions-ന്‌ against ഉള്ള appeals hear ചെയ്യുന്നു. High Court-ൽ further appeal ചെയ്യാം." }
+    ],
+    ex_en: "Before the IT Act, if someone hacked your email and stole money, police could barely do anything — no law covered it. The IT Act changed that. It's like creating traffic rules after cars were invented: the technology came first, the law followed to bring order.",
+    ex_ml: "IT Act-ന് മുൻപ്, ആരെങ്കിലും നിങ്ങളുടെ email hack ചെയ്ത് money steal ചെയ്താൽ, police-ന് ഒന്നും ചെയ്യാൻ കഴിയില്ലായിരുന്നു — ഒരു law cover ചെയ്തിരുന്നില്ല. IT Act അത് മാറ്റി. Cars കണ്ടുപിടിച്ചതിന് ശേഷം traffic rules ഉണ്ടാക്കിയത് പോലെ — technology വന്നു, പിന്നെ law വന്നു order കൊണ്ടുവരാൻ."
+  },
+  {
+    num: 4,
+    title: "Introduction to Cyber Law & Its Relevance in India",
+    ml_title: "സൈബർ നിയമം – ഇന്ത്യൻ സന്ദർഭത്തിൽ",
+    def_en: "Cyber law (also called Internet Law or IT Law) is the legal framework governing activities conducted through computers, networks, and digital platforms. India's primary cyber legislation is the Information Technology Act, 2000, amended in 2008 to address modern threats.",
+    def_ml: "Cyber law (Internet Law / IT Law എന്നും പറയും) computers, networks, digital platforms വഴി നടക്കുന്ന activities govern ചെയ്യുന്ന legal framework ആണ്. India-ൽ primary legislation Information Technology Act, 2000 ആണ്, 2008-ൽ amend ചെയ്തു.",
+    keypoints: [
+      { en: "<strong>What Cyber Law Covers:</strong> Cybercrimes (hacking, identity theft, stalking, fraud); e-commerce and digital contracts; data protection and privacy; IPR on the internet; social media regulation; cybersecurity and digital evidence.", ml: "Cyber law cover ചെയ്യുന്നത്: Cybercrimes, e-commerce, data protection, IPR, social media regulation, digital evidence." },
+      { en: "<strong>Growing Digital Population:</strong> India has one of the largest internet user bases — more users means more risk of cybercrime, making cyber law increasingly important.", ml: "India-ൽ internet users ഏറ്റവും കൂടുതൽ ഉള്ള countries-ൽ ഒന്നാണ്. Users കൂടുന്തോറും cybercrime risk-ഉം കൂടുന്നു." },
+      { en: "<strong>Digital India Initiative:</strong> Government services moved online — e-governance, online banking, Aadhaar-based services, digital signatures all need cyber law protection.", ml: "Government services online ആയി — e-governance, online banking, Aadhaar services, digital signatures — ഇവ ഒക്കെ cyber law protection ആവശ്യമാണ്." },
+      { en: "<strong>National Security:</strong> Cyber threats from terrorists, hostile nations, and hackers can disrupt critical infrastructure — cyber law provides mechanisms to handle cyber terrorism and espionage.", ml: "Terrorists, hostile nations, hackers-ൽ നിന്നുള്ള cyber threats national security-ക്ക് ഭീഷണിയാണ്. Cyber law ഇവ handle ചെയ്യാൻ framework കൊടുക്കുന്നു." },
+      { en: "<strong>Key IT Act Sections to Remember:</strong> Sec 43 & 66 (hacking, data theft), Sec 66C & 66D (identity theft, impersonation), Sec 67 (obscene content), Sec 69 (govt. interception & monitoring), Sec 72 (breach of privacy), Sec 66F (cyber terrorism).", ml: "Important sections: 43 & 66 (hacking), 66C & 66D (identity theft), 67 (obscene content), 69 (govt monitoring), 72 (privacy breach), 66F (cyber terrorism)." }
+    ],
+    ex_en: "Cyber law is to the internet what the Indian Penal Code is to the physical world. Just like you can't steal from a shop without breaking IPC laws, you can't hack someone's account without breaking IT Act laws. Same concept, different world.",
+    ex_ml: "Cyber law, internet-ന് IPC (Indian Penal Code) physical world-ന് ഉള്ളത് പോലെ ആണ്. Shop-ൽ നിന്ന് steal ചെയ്താൽ IPC break ആകും, account hack ചെയ്താൽ IT Act break ആകും. Same concept, different world."
+  },
+  {
+    num: 5,
+    title: "Cyber Crimes – Types & Characteristics",
+    ml_title: "സൈബർ ക്രൈംസ് – തരങ്ങളും സ്വഭാവങ്ങളും",
+    def_en: "A cybercrime is any criminal activity that involves computers, digital devices, or networks as tools, targets, or both. It involves misusing technology to commit offences such as data theft, fraud, harassment, or unauthorized access to systems.",
+    def_ml: "Computers, digital devices, networks-നെ tool ആയോ target ആയോ ഉപയോഗിച്ച് നടത്തുന്ന criminal activity ആണ് cybercrime. Data theft, fraud, harassment, unauthorized access — ഇവ ഒക്കെ cybercrimes ആണ്.",
+    keypoints: [
+      { en: "<strong>Crimes Against Individuals:</strong> Identity theft, cyber stalking, phishing & email scams, online defamation, cyberbullying, financial fraud (UPI fraud, ATM cloning).", ml: "Individuals-നെ target ചെയ്യുന്ന crimes: Identity theft, cyber stalking, phishing, online defamation, cyberbullying, UPI fraud, ATM cloning." },
+      { en: "<strong>Crimes Against Property:</strong> Hacking (unauthorized system access), data theft, ransomware attacks (locks system until ransom is paid), DDoS attacks (overloading servers), crypto-jacking (using someone's system for mining).", ml: "Property-നെ target ചെയ്യുന്ന crimes: Hacking, data theft, ransomware (system lock ചെയ്ത് ransom demand ചെയ്യുന്നു), DDoS attacks, crypto-jacking." },
+      { en: "<strong>Crimes Against Government & Society:</strong> Cyber terrorism (attacking govt. networks/infrastructure), cyber warfare (state-sponsored attacks), espionage (stealing govt. secrets), spreading fake news/propaganda.", ml: "Government & society-നെ target ചെയ്യുന്ന crimes: Cyber terrorism, cyber warfare, espionage, fake news spreading." },
+      { en: "<strong>Common Methods:</strong> Malware (viruses, worms, trojans, ransomware), social engineering, password cracking (brute-force, dictionary attacks), SQL injection, Man-in-the-Middle (MITM) attacks, Botnets.", ml: "Common methods: Malware, social engineering (people-നെ manipulate ചെയ്ത് info reveal ചെയ്യിക്കുന്നു), password cracking, SQL injection, MITM attacks, Botnets." },
+      { en: "<strong>Key Characteristics of Cybercrime:</strong> No physical boundaries, anonymity, high speed and automation, low cost but high impact, difficult to detect, technically complex.", ml: "Cybercrime-ന്റെ characteristics: Physical boundary ഇല്ല, anonymity ഉണ്ട്, speed കൂടുതലാണ്, detect ചെയ്യാൻ ബുദ്ധിമുട്ടാണ്, technically complex ആണ്." }
+    ],
+    ex_en: "Ransomware is like a digital kidnapper — it locks all your files and demands money (ransom) to unlock them. WannaCry in 2017 infected over 200,000 computers worldwide, including hospitals, in just a few days. That's the scale cybercrime can reach.",
+    ex_ml: "Ransomware ഒരു digital kidnapper-നെ പോലെ ആണ് — നിങ്ങളുടെ files ഒക്കെ lock ചെയ്ത്, unlock ചെയ്യാൻ money demand ചെയ്യുന്നു. 2017-ലെ WannaCry attack worldwide 2 lakh-ൽ കൂടുതൽ computers — hospitals ഉൾപ്പെടെ — ദിവസങ്ങൾ കൊണ്ട് infect ചെയ്തു. ഇതാണ് cybercrime-ന്റെ scale."
+  },
+  {
+    num: 6,
+    title: "Cyber Criminals & Their Objectives",
+    ml_title: "സൈബർ ക്രിമിനലുകളും അവരുടെ ലക്ഷ്യങ്ങളും",
+    def_en: "Cyber criminals are individuals, groups, or organizations that use computers, networks, or digital technologies to carry out illegal activities. They exploit vulnerabilities in systems, software, and human behavior to steal information, cause harm, or gain unauthorized benefits.",
+    def_ml: "Computers, networks, digital technologies ഉപയോഗിച്ച് illegal activities നടത്തുന്ന individuals, groups, organizations ആണ് cyber criminals. Systems, software, human behavior-ൽ ഉള്ള vulnerabilities exploit ചെയ്ത് information steal ചെയ്യുകയോ harm cause ചെയ്യുകയോ ചെയ്യുന്നു.",
+    keypoints: [
+      { en: "<strong>Amateur Hackers (Script Kiddies):</strong> Beginners with limited technical skills; use ready-made tools/scripts created by others; motivated by fun, curiosity, or peer recognition.", ml: "Technical skill കുറവ് ഉള്ള beginners. Others ഉണ്ടാക്കിയ ready-made tools use ചെയ്യുന്നു. Fun, curiosity, peer recognition-ന് വേണ്ടി hack ചെയ്യുന്നു." },
+      { en: "<strong>Professional Hackers:</strong> Highly skilled; work for money, espionage, or sabotage; often hired by criminal organizations or companies (ethical or unethical).", ml: "Highly skilled ആണ്. Money, espionage, sabotage-ന് വേണ്ടി work ചെയ്യുന്നു. Criminal organizations അല്ലെങ്കിൽ companies hire ചെയ്യാറുണ്ട്." },
+      { en: "<strong>Cyber Terrorists:</strong> Target critical infrastructure (power grids, hospitals, defense); aim to create fear or disrupt national security; politically or ideologically motivated.", ml: "Critical infrastructure (power grids, hospitals, defense) target ചെയ്യുന്നു. Fear create ചെയ്യുകയോ national security disrupt ചെയ്യുകയോ ആണ് ലക്ഷ്യം. Political/ideological motivation ആണ്." },
+      { en: "<strong>Organized Cybercrime Groups:</strong> Well-structured teams with division of labor; involved in large-scale financial fraud, ransomware, drug trafficking; operate like traditional mafia but online.", ml: "Division of labor ഉള്ള structured teams. Large-scale financial fraud, ransomware, drug trafficking. Traditional mafia-നെ പോലെ operate ചെയ്യുന്നു, but online." },
+      { en: "<strong>Hacktivists:</strong> Combine hacking + activism; attack systems to protest or support social/political causes; examples include website defacement and data leaks.", ml: "Hacking + activism combine ചെയ്യുന്നു. Social/political causes-ന് support ആയി systems attack ചെയ്യുന്നു. Website defacement, data leaks ഇതിൽ ഉൾപ്പെടുന്നു." },
+      { en: "<strong>Their Objectives:</strong> Financial gain (most common — banking fraud, ransomware, card fraud, dark web data selling), stealing information, unauthorized access/control, espionage, causing disruption, spreading fear, personal motives (revenge, jealousy).", ml: "Objectives: Financial gain (ഏറ്റവും common), information stealing, unauthorized access, espionage, disruption cause ചെയ്യൽ, fear spread ചെയ്യൽ, personal reasons (revenge, jealousy)." }
+    ],
+    ex_en: "Anonymous is a famous hacktivist group — they've attacked government websites and corporations to protest censorship and corruption. They don't steal money; their weapon is exposure. Compare that to organized crime groups who silently drain bank accounts — same tool (hacking), completely different motive.",
+    ex_ml: "Anonymous ഒരു famous hacktivist group ആണ് — censorship, corruption-നെ protest ചെയ്ത് government websites attack ചെയ്തിട്ടുണ്ട്. അവർ money steal ചെയ്യുന്നില്ല; exposure ആണ് weapon. Organized crime groups silently bank accounts drain ചെയ്യുന്നു — same tool (hacking), completely different motive."
+  },
+  {
+    num: 7,
+    title: "E-Commerce & Related Issues",
+    ml_title: "ഇ-കൊമേഴ്‌സും അനുബന്ധ പ്രശ്‌നങ്ങളും",
+    def_en: "Electronic Commerce (E-Commerce) refers to the buying and selling of goods and services through electronic networks, mainly the internet. It allows businesses and consumers to conduct transactions online without the need for physical interaction.",
+    def_ml: "Electronic networks, mainly internet, വഴി goods and services buy ചെയ്യുകയും sell ചെയ്യുകയും ചെയ്യുന്നതാണ് E-Commerce. Physical interaction ഇല്ലാതെ online-ൽ transactions നടത്താം — Amazon, Flipkart, eBay ഇതിന്‌ examples ആണ്.",
+    keypoints: [
+      { en: "<strong>Types of E-Commerce:</strong> B2B (Business to Business — wholesale suppliers), B2C (Business to Consumer — Amazon to customers), C2C (Consumer to Consumer — OLX, eBay), C2B (Consumer to Business — freelancers offering services to companies).", ml: "Types: B2B (businesses-ൽ നിന്ന് businesses-ലേക്ക്), B2C (business-ൽ നിന്ന് customers-ലേക്ക് — Amazon), C2C (customers-ൽ നിന്ന് customers-ലേക്ക് — OLX), C2B (freelancers services offer ചെയ്യുന്നു)." },
+      { en: "<strong>Features:</strong> Global Reach (sell worldwide), 24/7 Availability, Reduced Operational Costs (no physical store needed), Convenience (shop from home), Faster Transactions.", ml: "Features: Global reach, 24/7 available, physical store ഇല്ലാതെ operate ചെയ്യാം, home-ൽ നിന്ന് shop ചെയ്യാം, fast transactions." },
+      { en: "<strong>Security Issues:</strong> Credit card details and personal data are targets for hackers during online transactions.", ml: "Online transactions-ൽ credit card details, personal data hackers target ചെയ്യുന്നു. Security ഒരു major concern ആണ്." },
+      { en: "<strong>Privacy Concerns:</strong> Customer data (addresses, payment info) must be protected from misuse by third parties and even by the platform itself.", ml: "Customer data (addresses, payment info) misuse ആകാതെ protect ചെയ്യണം. Third parties-ൽ നിന്നും platform-ൽ നിന്ന് തന്നെയും." },
+      { en: "<strong>Other Related Issues:</strong> Online fraud & phishing (fake websites), authentication challenges (verifying real sellers/buyers), legal & regulatory complexity (different country laws), payment problems (failed transactions, refund delays), intellectual property violations (illegal software/music distribution).", ml: "Other issues: Online fraud, phishing, seller/buyer verification ബുദ്ധിമുട്ടാണ്, different country-ൽ different laws, failed transactions, refund delays, illegal software/music distribution." }
+    ],
+    ex_en: "Think of a fake Amazon website that looks identical to the real one — same logo, same layout. You enter your credit card details and boom, your money is gone. This is e-commerce fraud via phishing. Always check for HTTPS and the exact URL before entering payment details.",
+    ex_ml: "Real Amazon-ന്‌ exactly same ആയി കാണുന്ന ഒരു fake website imagine ചെയ്യൂ — same logo, same layout. Credit card details enter ചെയ്ത്, money gone. ഇതാണ് phishing through e-commerce fraud. Payment details enter ചെയ്യുന്നതിന് മുൻപ് HTTPS, exact URL check ചെയ്യണം."
+  },
+  {
+    num: 8,
+    title: "Intellectual Property Rights (IPR)",
+    ml_title: "ബൗദ്ധിക സ്വത്തവകാശങ്ങൾ (IPR)",
+    def_en: "Intellectual Property Rights (IPR) are legal rights given to individuals or organizations to protect their creations of the mind — such as inventions, literary works, artistic works, designs, symbols, and brand names. IPR ensures creators can control and benefit financially from their work.",
+    def_ml: "IPR (Intellectual Property Rights) എന്നത് mind-ന്റെ creations protect ചെയ്യാൻ creators-ന് കൊടുക്കുന്ന legal rights ആണ്. Inventions, literary works, artistic works, designs, brand names — ഇവ ഒക്കെ ഉൾപ്പെടുന്നു. Creators-ന് financial benefit ഉറപ്പാക്കുന്നു.",
+    keypoints: [
+      { en: "<strong>Copyright:</strong> Protects literary, artistic, musical, and dramatic works (books, movies, songs, software). Gives creator exclusive rights to reproduce, distribute, and publish. In India, protected under Copyright Act, 1957.", ml: "Literary, artistic, musical, dramatic works protect ചെയ്യുന്നു. Books, movies, songs, software ഒക്കെ ഇതിൽ ഉൾപ്പെടുന്നു. India-ൽ Copyright Act, 1957 ഉണ്ട്." },
+      { en: "<strong>Patent:</strong> Protects new inventions and technological innovations. Gives inventor exclusive rights for usually 20 years to use, manufacture, and sell the invention.", ml: "New inventions, technological innovations protect ചെയ്യുന്നു. Generally 20 years-ൽ exclusivity. Inventor-ന് manufacture, sell ചെയ്യാനുള്ള exclusive right കൊടുക്കുന്നു." },
+      { en: "<strong>Trademark:</strong> Protects symbols, logos, brand names, slogans used to identify goods/services. Examples: Apple logo, Nike swoosh — these are trademarked.", ml: "Symbols, logos, brand names, slogans protect ചെയ്യുന്നു. Apple logo, Nike swoosh — ഇവ trademarked ആണ്." },
+      { en: "<strong>Industrial Design:</strong> Protects the visual appearance of a product — shape, pattern, or color.", ml: "Product-ന്റെ visual appearance protect ചെയ്യുന്നു — shape, pattern, color." },
+      { en: "<strong>Trade Secrets:</strong> Confidential business information that gives competitive advantage — formulas, processes, marketing strategies. E.g., Coca-Cola's recipe.", ml: "Competitive advantage കൊടുക്കുന്ന confidential business info — formulas, processes, strategies. Coca-Cola-ന്റെ recipe ഒരു classic example ആണ്." },
+      { en: "<strong>IPR in Cyberspace:</strong> Internet makes it easy to copy and distribute content illegally. Issues include software piracy, digital copyright infringement, illegal downloading — all major threats to IPR in the digital age.", ml: "Internet-ൽ content illegally copy ചെയ്ത് distribute ചെയ്യൽ easy ആണ്. Software piracy, digital copyright infringement, illegal downloads — ഇവ digital age-ൽ IPR-ന്‌ major threats ആണ്." }
+    ],
+    ex_en: "When you buy a movie ticket, you're paying for the right to watch it once in a theatre. Copying that movie and sharing it online is copyright infringement — the creator loses money for every illegal copy shared. That's why piracy is not just 'free stuff' — it's theft of intellectual property.",
+    ex_ml: "Movie ticket വാങ്ങുമ്പോൾ, theatre-ൽ ഒരു തവണ കാണാനുള്ള right-ന് pay ചെയ്യുകയാണ്. ആ movie copy ചെയ്ത് online share ചെയ്യൽ copyright infringement ആണ് — ഒരു illegal copy share ചെയ്യുന്തോറും creator-ന് money lose ആകുന്നു. Piracy just 'free stuff' അല്ല — intellectual property theft ആണ്."
+  },
+  {
+    num: 9,
+    title: "Key Provisions of the IT Act, 2000",
+    ml_title: "IT ആക്ട് 2000-ന്റെ പ്രധാന വകുപ്പുകൾ",
+    def_en: "The Information Technology Act, 2000 is India's primary law dealing with cybercrimes, electronic governance, and digital transactions. It provides legal recognition to electronic records and prescribes specific penalties and punishments for various cyber offences.",
+    def_ml: "IT Act, 2000 India-ൽ cybercrimes, electronic governance, digital transactions deal ചെയ്യുന്ന primary law ആണ്. Electronic records-ന് legal recognition കൊടുക്കുകയും cyber offences-ന് specific penalties prescribe ചെയ്യുകയും ചെയ്യുന്നു.",
+    keypoints: [
+      { en: "<strong>Sec 43 – Damage to Computer Systems:</strong> Unauthorized access, downloading data, introducing viruses, disrupting services. Penalty: Compensation up to ₹1 crore.", ml: "Sec 43: Unauthorized access, virus introduce ചെയ്യൽ, services disrupt ചെയ്യൽ. Penalty: ₹1 crore compensation വരെ." },
+      { en: "<strong>Sec 65 – Tampering with Source Code:</strong> Concealing, destroying, or altering computer source programs. Punishment: Up to 3 years imprisonment and/or fine up to ₹2 lakh.", ml: "Sec 65: Source code conceal, destroy, alter ചെയ്യൽ. Punishment: 3 years imprisonment, ₹2 lakh fine." },
+      { en: "<strong>Sec 66 – Computer-Related Offences:</strong> Hacking, unauthorized access with intent to cause loss, data theft, spreading malware — when done dishonestly. Punishment: Up to 3 years imprisonment and/or fine up to ₹5 lakh.", ml: "Sec 66: Dishonestly ചെയ്യുന്ന hacking, data theft, malware spreading. Punishment: 3 years imprisonment, ₹5 lakh fine." },
+      { en: "<strong>Sec 66C – Identity Theft:</strong> Misusing another person's password, digital signature, biometric data, or Aadhaar. Punishment: Up to 3 years imprisonment and fine up to ₹1 lakh.", ml: "Sec 66C: Others-ന്റെ password, digital signature, biometric data, Aadhaar misuse ചെയ്യൽ. Punishment: 3 years + ₹1 lakh fine." },
+      { en: "<strong>Sec 66D – Cheating by Personation:</strong> Phishing emails, fake websites, online scams, fake job offers, impersonation through social media. Punishment: Up to 3 years imprisonment and fine up to ₹1 lakh.", ml: "Sec 66D: Phishing, fake websites, online scams, impersonation. Punishment: 3 years + ₹1 lakh fine." },
+      { en: "<strong>Sec 66E – Violation of Privacy:</strong> Capturing private images without consent, publishing intimate content, secretly recording someone. Punishment: Up to 3 years imprisonment and/or fine up to ₹2 lakh.", ml: "Sec 66E: Consent ഇല്ലാതെ private images capture/publish ചെയ്യൽ, secretly record ചെയ്യൽ. Punishment: 3 years, ₹2 lakh fine." },
+      { en: "<strong>Sec 66F – Cyber Terrorism:</strong> Unauthorized access to government/defence networks, acts threatening national sovereignty or public order. Punishment: Life imprisonment.", ml: "Sec 66F: Government/defence networks attack ചെയ്ത് national security threaten ചെയ്യൽ. Punishment: Life imprisonment." },
+      { en: "<strong>Sec 67 – Obscene Content Online:</strong> Publishing or transmitting sexually explicit or obscene material electronically. Punishment: First conviction up to 3 years; subsequent conviction up to 5 years.", ml: "Sec 67: Obscene/sexually explicit content online publish/transmit ചെയ്യൽ. First conviction: 3 years. Subsequent: 5 years." },
+      { en: "<strong>Sec 72 – Breach of Confidentiality:</strong> Disclosing personal or confidential data without consent by those who legally accessed it (employees, service providers). Punishment: Up to 2 years imprisonment and/or fine up to ₹1 lakh.", ml: "Sec 72: Legally access ചെയ്ത info consent ഇല്ലാതെ disclose ചെയ്യൽ (employees, service providers). Punishment: 2 years, ₹1 lakh fine." }
+    ],
+    ex_en: "Quick memory trick for the sections: 43 = Access damage (crore), 65 = Source code tamper, 66 = Hacking (the big one with sub-sections A to F), 67 = Obscene content, 72 = Privacy breach. The punishment generally increases with the severity — life imprisonment only for cyber terrorism (66F).",
+    ex_ml: "Sections remember ചെയ്യാൻ trick: 43 = Access damage (crore penalty), 65 = Source code tamper, 66 = Hacking (A to F sub-sections), 67 = Obscene content, 72 = Privacy breach. Punishment severity-നനുസരിച്ച് increase ആകുന്നു — Life imprisonment only cyber terrorism-ന് (66F)."
+  },
+  {
+    num: 10,
+    title: "Overview of Cyber Crime Investigation Cell (CCIC)",
+    ml_title: "സൈബർ ക്രൈം ഇൻവെസ്റ്റിഗേഷൻ സെൽ (CCIC)",
+    def_en: "The Cyber Crime Investigation Cell (CCIC) is a specialized law enforcement unit established to prevent, detect, investigate, and prosecute cybercrimes. In India, CCICs operate under State Police Departments, with legal backing from the IT Act 2000, IPC, and other relevant laws.",
+    def_ml: "CCIC (Cyber Crime Investigation Cell) cybercrimes prevent, detect, investigate, prosecute ചെയ്യാൻ establish ചെയ്ത specialized law enforcement unit ആണ്. India-ൽ State Police Departments-ന്റെ കീഴിൽ operate ചെയ്യുന്നു, IT Act 2000, IPC-ന്റെ backing ഉണ്ട്.",
+    keypoints: [
+      { en: "<strong>Structure:</strong> Cyber Crime Police Officers (trained in cyber law & digital forensics), Technical Experts (IT professionals, ethical hackers, forensic analysts), Legal Experts, Digital Forensic Laboratories, Support Staff.", ml: "Structure: Cyber Crime Police Officers, Technical Experts (IT professionals, ethical hackers, forensic analysts), Legal Experts, Digital Forensic Labs, Support Staff." },
+      { en: "<strong>National-Level Agencies:</strong> Indian Cyber Crime Coordination Centre (I4C) and CERT-In (Computer Emergency Response Team India) operate at the national level.", ml: "National level-ൽ I4C (Indian Cyber Crime Coordination Centre), CERT-In ഉണ്ട്." },
+      { en: "<strong>Key Functions – Registration & Investigation:</strong> Receives cybercrime complaints (at cyber police stations or National Cyber Crime Reporting Portal). Registers FIR after verification. Tracks IP addresses, email headers, server logs, digital footprints. Seizes computers, phones, hard disks.", ml: "Complaints receive ചെയ്ത് FIR register ചെയ്യുന്നു. IP addresses, email headers, server logs, digital footprints track ചെയ്യുന്നു. Computers, phones, hard disks seize ചെയ്യുന്നു." },
+      { en: "<strong>Digital Forensic Analysis:</strong> Analyzes computers, mobiles, emails, social media accounts, network traffic; recovers deleted files and encrypted data; identifies malware or hacking tools used.", ml: "Computers, mobiles, emails, social media, network traffic analyze ചെയ്യുന്നു. Deleted files recover ചെയ്യുന്നു. Malware, hacking tools identify ചെയ്യുന്നു." },
+      { en: "<strong>Coordination:</strong> Works with banks, ISPs, social media platforms, and national/international cyber crime agencies — essential for cross-border cybercrimes.", ml: "Banks, ISPs, social media platforms, international agencies-ന്‌ ഒപ്പം coordinate ചെയ്യുന്നു — cross-border crimes handle ചെയ്യാൻ essential ആണ്." },
+      { en: "<strong>Challenges:</strong> Rapid technology changes, criminals using anonymity tools and encryption, cross-border jurisdiction issues, shortage of trained cyber professionals, low user awareness.", ml: "Challenges: Fast technology changes, anonymity tools/encryption use, cross-border jurisdiction issues, trained professionals shortage, user awareness കുറവ്." }
+    ],
+    ex_en: "CCIC is basically the CSI (Crime Scene Investigation) unit for the digital world. Instead of fingerprints, they collect IP addresses and server logs. Instead of DNA, they do digital forensics. The tools are different, but the goal is the same — catch the criminal.",
+    ex_ml: "CCIC basically digital world-ന്റെ CSI unit ആണ്. Fingerprints-ന്‌ പകരം IP addresses, server logs collect ചെയ്യുന്നു. DNA-ന്‌ പകരം digital forensics ചെയ്യുന്നു. Tools different ആണ്, goal same ആണ് — criminal-നെ catch ചെയ്യുക."
+  },
+  {
+    num: 11,
+    title: "Reporting Cyber Crimes",
+    ml_title: "സൈബർ ക്രൈം റിപ്പോർട്ട് ചെയ്യൽ",
+    def_en: "Reporting a cybercrime is the process by which a victim of an online offence formally notifies law enforcement authorities so that an investigation can be initiated. In India, victims can report cyber crimes online or at a physical cyber cell.",
+    def_ml: "Online offence-ന്‌ victim ആയ ആൾ law enforcement-നെ formally notify ചെയ്ത് investigation initiate ചെയ്യുന്ന process ആണ് cybercrime reporting. India-ൽ online ആയോ physical cyber cell-ൽ ചെന്നോ report ചെയ്യാം.",
+    keypoints: [
+      { en: "<strong>National Cyber Crime Reporting Portal:</strong> www.cybercrime.gov.in — the official online portal to report cybercrimes anywhere in India, available 24/7.", ml: "www.cybercrime.gov.in — India-ൽ anywhere ഉള്ള cybercrime report ചെയ്യാൻ official online portal. 24/7 available ആണ്." },
+      { en: "<strong>Cyber Crime Police Station / Cyber Cell:</strong> Visit the nearest cyber crime cell or local police station. An FIR (First Information Report) will be filed after initial verification.", ml: "Nearest cyber crime cell അല്ലെങ്കിൽ local police station-ൽ ചെല്ലണം. Initial verification-ന് ശേഷം FIR register ചെയ്യും." },
+      { en: "<strong>Evidence to Collect Before Reporting:</strong> Screenshots of messages, threats, or fraudulent pages; email headers; transaction IDs or bank statements; URLs of fake websites; call logs or chat records.", ml: "Report ചെയ്യുന്നതിന് മുൻപ് collect ചെയ്യേണ്ടത്: Screenshots (messages, threats, fake pages), email headers, transaction IDs, bank statements, fake website URLs, call logs, chat records." },
+      { en: "<strong>What Happens After Reporting:</strong> Complaint is verified and FIR is registered. CCIC investigators track IP addresses, digital footprints. Devices may be seized for forensic analysis. Case is prosecuted under the IT Act and/or IPC.", ml: "Report ചെയ്ത ശേഷം: Complaint verify ചെയ്ത് FIR register ചെയ്യുന്നു. CCIC investigators IP addresses, digital footprints track ചെയ്യുന്നു. Devices forensic analysis-ന് seize ചെയ്യാം. IT Act/IPC-ന്‌ കീഴിൽ prosecute ചെയ്യുന്നു." },
+      { en: "<strong>If You Are Being Cyber Stalked or Harassed:</strong> Do not respond to the stalker. Collect all evidence. Block on all platforms. Report to www.cybercrime.gov.in and local police. Inform trusted family or friends.", ml: "Cyber stalking / harassment ആണെങ്കിൽ: Stalker-ന് respond ചെയ്യരുത്. Evidence collect ചെയ്യണം. All platforms-ൽ block ചെയ്യണം. Cybercrime portal-ൽ report ചെയ്യണം. Family/friends-നെ inform ചെയ്യണം." },
+      { en: "<strong>Regulatory Support (Section 46 — Adjudicating Officers):</strong> For financial cyber disputes up to ₹5 crore, Adjudicating Officers can award compensation. Appeals go to the Cyber Appellate Tribunal, then to the High Court.", ml: "Financial cyber disputes (₹5 crore വരെ) Adjudicating Officers handle ചെയ്യുന്നു. Appeal: Cyber Appellate Tribunal → High Court." }
+    ],
+    ex_en: "Think of www.cybercrime.gov.in like a 108 helpline — but for digital emergencies. If you receive a fake KYC call and lose ₹10,000 from your bank account, you don't have to go to a police station miles away. File the complaint online, attach your bank statement screenshots, and the cyber cell takes it from there.",
+    ex_ml: "www.cybercrime.gov.in-നെ ഒരു digital 108 helpline-ൽ പോലെ ആണ്. Fake KYC call-ൽ ₹10,000 lose ആയാൽ, miles away police station-ൽ ചെല്ലേണ്ടതില്ല. Online complaint file ചെയ്ത്, bank statement screenshots attach ചെയ്ത്, cyber cell handle ചെയ്യും."
+  }
+];
+
+let doneSet = new Set(JSON.parse(localStorage.getItem('se_done_v2') || '[]'));
+
+function saveDone() { localStorage.setItem('se_done_v2', JSON.stringify([...doneSet])); }
+
+function updateProgress() {
+  const pct = (doneSet.size / topics.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('doneCount').textContent = doneSet.size;
+}
+
+function renderTopics(list) {
+  const container = document.getElementById('topicList');
+  container.innerHTML = '';
+  list.forEach(t => {
+    const isDone = doneSet.has(t.num);
+    const item = document.createElement('div');
+    item.className = 'topic-item';
+    item.dataset.num = t.num;
+
+    const kpHtml = t.keypoints.map(k => `
+      <div class="kp-card">
+        <div class="kp-en">${k.en}</div>
+        <div class="kp-ml">🔹 ${k.ml}</div>
+      </div>
+    `).join('');
+
+    item.innerHTML = `
+      <div class="topic-header${isDone ? ' done' : ''}" onclick="toggleTopic(${t.num}, event)">
+        <span class="topic-num">${String(t.num).padStart(2,'0')}</span>
+        <div style="flex:1;min-width:0;">
+          <div class="topic-title">${t.title}</div>
+          <div class="topic-ml">${t.ml_title}</div>
+        </div>
+        <button class="check-btn${isDone ? ' done' : ''}" onclick="toggleDone(${t.num}, event)">${isDone ? '✓' : ''}</button>
+        <span class="chevron" id="chev-${t.num}">▼</span>
+      </div>
+      <div class="topic-body" id="body-${t.num}">
+        <div class="topic-content">
+          <div class="marks-badge">⭐ 5 Marks</div>
+
+          <div class="section">
+            <div class="section-label">📖 Definition</div>
+            <div class="def-en">${t.def_en}</div>
+            <div class="ml-block">${t.def_ml}</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="section">
+            <div class="section-label">🔑 Key Points (English + മലയാളം)</div>
+            <div class="kp-list">${kpHtml}</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="section">
+            <div class="section-label">💡 Real World Example</div>
+            <div class="example-wrap">
+              <div class="example-en">${t.ex_en}</div>
+              <div class="example-ml">${t.ex_ml}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function toggleTopic(num, e) {
+  if (e.target.classList.contains('check-btn') || e.target.closest && e.target.closest('.check-btn')) return;
+  const body = document.getElementById('body-' + num);
+  const chev = document.getElementById('chev-' + num);
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.topic-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.chevron').forEach(c => c.classList.remove('open'));
+  if (!isOpen) {
+    body.classList.add('open');
+    chev.classList.add('open');
+    setTimeout(() => body.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+  }
+}
+
+function toggleDone(num, e) {
+  e.stopPropagation();
+  if (doneSet.has(num)) doneSet.delete(num);
+  else doneSet.add(num);
+  saveDone();
+  updateProgress();
+  const header = document.querySelector(`[data-num="${num}"] .topic-header`);
+  const btn = document.querySelector(`[data-num="${num}"] .check-btn`);
+  const isDone = doneSet.has(num);
+  header.classList.toggle('done', isDone);
+  btn.classList.toggle('done', isDone);
+  btn.textContent = isDone ? '✓' : '';
+}
+
+function filterTopics(q) {
+  const query = q.toLowerCase();
+  renderTopics(topics.filter(t => t.title.toLowerCase().includes(query) || t.ml_title.includes(query)));
+}
+
+renderTopics(topics);
+updateProgress();
+</script>
+</body>
+</html>
